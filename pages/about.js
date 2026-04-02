@@ -27,7 +27,7 @@ export default function About() {
         <section className={styles.storySection}>
           <div className={styles.storyContainer}>
             <img
-              src="/images/about-story.png"
+              src="/images/about-story1.jpeg"
               alt="Amul's History"
               className={styles.storyImage}
             />
