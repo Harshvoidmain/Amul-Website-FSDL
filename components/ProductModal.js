@@ -30,12 +30,22 @@ export default function ProductModal({ product, onClose }) {
     if (e.target === e.currentTarget) handleClose();
   };
 
-  const { name, price, image, category, rating, reviews, description } = product;
+  const {
+    name = '',
+    price = 0,
+    image = '/images/placeholder.png',
+    category = '',
+    rating = 0,
+    reviews = 0,
+    description = ''
+  } = product || {};
 
   const categoryLabel = category
-    .split('-')
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' & ');
+    ? category
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' & ')
+    : 'Uncategorized';
 
   return (
     <div

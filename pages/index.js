@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import HeroSection from '../components/HeroSection';
@@ -37,9 +37,34 @@ export async function getServerSideProps() {
   }
 }
 
-export default function Home({ products, categories }) {
-  const featuredProducts = products.slice(0, 5);
+export default function Home({ products: initialProducts, categories: initialCategories }) {
+  const [products, setProducts] = useState(initialProducts);
+  const [categories, setCategories] = useState(initialCategories);
   const [modalProduct, setModalProduct] = useState(null);
+
+  // Fetch data client-side (visible in network tab)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [productsRes, categoriesRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`)
+        ]);
+
+        const productsData = await productsRes.json();
+        const categoriesData = await categoriesRes.json();
+
+        setProducts(productsData.data || []);
+        setCategories(categoriesData.data || []);
+      } catch (error) {
+        console.error('Client-side fetch error:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const featuredProducts = products.slice(0, 5);
 
   return (
     <>
