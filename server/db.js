@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
-const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/amul';
-
+const mongoUri = process.env.MONGODB_URI ;
 async function connect() {
   try {
     // Mongoose v7 no longer requires explicit parser/driver flags
