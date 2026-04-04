@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../../styles/ProductDetail.module.css';
 
-const API_URL = process.env.API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:4000';
 
 export async function getServerSideProps(context) {
   const { id } = context.params;

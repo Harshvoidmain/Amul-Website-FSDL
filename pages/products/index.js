@@ -5,7 +5,7 @@ import ProductCard from '../../components/ProductCard';
 import ProductModal from '../../components/ProductModal';
 import styles from '../../styles/Products.module.css';
 
-const API_URL = process.env.API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:4000';
 
 export async function getServerSideProps(context) {
   const { category } = context.query;

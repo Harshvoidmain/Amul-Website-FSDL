@@ -1,10 +1,31 @@
 const Category = require('../models/Category');
 const { categories: inMemoryCats, getNextId } = require('../data/categoriesData');
 
+function slugify(text) {
+  return String(text)
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
 const getAll = async (req, res) => {
   try {
     if (Category.find) {
-      const docs = await Category.find().lean();
+      let docs = await Category.find().lean();
+      // If DB returned no categories, fall back to in-memory seed data for dev
+      if (!docs || docs.length === 0) {
+        if (inMemoryCats && inMemoryCats.length) return res.json({ data: inMemoryCats });
+      }
+      // Ensure each category has a slug and icon path
+      docs = docs.map((c) => ({
+        id: c.id || c._id,
+        name: c.name,
+        icon: c.icon || '',
+        slug: c.slug && c.slug.length ? c.slug : slugify(c.name)
+      }));
       return res.json({ data: docs });
     }
   } catch (err) {

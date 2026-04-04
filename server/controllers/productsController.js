@@ -1,16 +1,53 @@
 const Product = require('../models/Product');
 const { products: inMemoryProducts, getNextId } = require('../data/productsData');
 
+function slugify(text) {
+  return String(text)
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
 const getAll = async (req, res) => {
+  const { category } = req.query;
   try {
     if (Product.db && Product.find) {
-      const docs = await Product.find().lean();
+      const query = {};
+      if (category && category !== 'all') query.category = category;
+      let docs = await Product.find(query).lean();
+      // If DB returned no documents, fall back to in-memory seed data for dev
+      if (!docs || docs.length === 0) {
+        if (inMemoryProducts && inMemoryProducts.length) {
+          const filtered = category && category !== 'all'
+            ? inMemoryProducts.filter((p) => p.category === category)
+            : inMemoryProducts;
+          return res.json({ data: filtered });
+        }
+      }
+      // Normalize category field to slug for each product
+      docs = docs.map((p) => ({
+        id: p.id || p._id,
+        name: p.name,
+        price: p.price,
+        description: p.description || '',
+        category: p.category && p.category.length ? slugify(p.category) : '',
+        image: p.image || '',
+        rating: p.rating || 0,
+        reviews: p.reviews || 0
+      }));
       return res.json({ data: docs });
     }
   } catch (err) {
     console.error('DB product fetch error:', err.message);
   }
-  // fallback
+  // fallback to in-memory
+  if (category && category !== 'all') {
+    const filtered = inMemoryProducts.filter((p) => p.category === category);
+    return res.json({ data: filtered });
+  }
   res.json({ data: inMemoryProducts });
 };
 
