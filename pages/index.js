@@ -45,21 +45,24 @@ export default function Home({ products: initialProducts, categories: initialCat
   // Fetch data client-side (visible in network tab)
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [productsRes, categoriesRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`)
-        ]);
+  try {
+    const res = await fetch('/api/your-endpoint');
+    
+    // Check if the response is actually JSON
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const errorHtml = await res.text();
+      console.error("Received HTML instead of JSON. The server sent this:");
+      console.log(errorHtml); // This will show you the 404 or 500 error page
+      return;
+    }
 
-        const productsData = await productsRes.json();
-        const categoriesData = await categoriesRes.json();
-
-        setProducts(productsData.data || []);
-        setCategories(categoriesData.data || []);
-      } catch (error) {
-        console.error('Client-side fetch error:', error);
-      }
-    };
+    const data = await res.json();
+    console.log(data);
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
+};
 
     fetchData();
   }, []);
