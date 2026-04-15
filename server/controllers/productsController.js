@@ -15,9 +15,16 @@ const getAll = async (req, res) => {
   const { category } = req.query;
   try {
     if (Product.db && Product.find) {
-      const query = {};
-      if (category && category !== 'all') query.category = category;
-      let docs = await Product.find(query).lean();
+      // When a category slug is provided, DB may store category names
+      // in a different format (e.g. 'Butter' vs 'butter'), so fetch
+      // all documents and filter by slugified category to be robust.
+      let docs;
+      if (category && category !== 'all') {
+        const allDocs = await Product.find({}).lean();
+        docs = allDocs.filter((p) => slugify(p.category) === category);
+      } else {
+        docs = await Product.find({}).lean();
+      }
       // If DB returned no documents, fall back to in-memory seed data for dev
       if (!docs || docs.length === 0) {
         if (inMemoryProducts && inMemoryProducts.length) {

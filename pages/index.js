@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import HeroSection from '../components/HeroSection';
@@ -8,7 +8,7 @@ import ContactForm from '../components/ContactForm';
 import ProductModal from '../components/ProductModal';
 import styles from '../styles/Home.module.css';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export async function getServerSideProps() {
   try {
@@ -42,30 +42,7 @@ export default function Home({ products: initialProducts, categories: initialCat
   const [categories, setCategories] = useState(initialCategories);
   const [modalProduct, setModalProduct] = useState(null);
 
-  // Fetch data client-side (visible in network tab)
-  useEffect(() => {
-    const fetchData = async () => {
-  try {
-    const res = await fetch('/api/your-endpoint');
-    
-    // Check if the response is actually JSON
-    const contentType = res.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      const errorHtml = await res.text();
-      console.error("Received HTML instead of JSON. The server sent this:");
-      console.log(errorHtml); // This will show you the 404 or 500 error page
-      return;
-    }
-
-    const data = await res.json();
-    console.log(data);
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
-};
-
-    fetchData();
-  }, []);
+  // No client-side fetch here — initial data is loaded via getServerSideProps
 
   const featuredProducts = products.slice(0, 5);
 
