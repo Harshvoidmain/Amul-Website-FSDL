@@ -3,10 +3,35 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import styles from '../styles/Navbar.module.css';
 
+const inlineStyles = {
+  userSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    marginLeft: '16px',
+  },
+  userName: {
+    fontSize: '14px',
+    color: '#333',
+    fontWeight: '500',
+  },
+  logoutBtn: {
+    padding: '7px 16px',
+    background: '#ff3b30',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '14px',
+  },
+};
+
 export default function Navbar() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,16 +41,27 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      setUser(JSON.parse(stored));
+    }
+  }, []);
+
   const handleContactClick = (e) => {
     e.preventDefault();
     setMobileOpen(false);
     if (router.pathname === '/') {
-      // Already on home page, smooth scroll to contact
       document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      // Navigate to home page then scroll
       router.push('/#contact');
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
   };
 
   const links = [
@@ -43,7 +79,7 @@ export default function Navbar() {
         </Link>
 
         <div className={styles.navLinks}>
-          {links.map((link) => (
+          {links.map((link) =>
             link.isContact ? (
               <a
                 key={link.href}
@@ -62,7 +98,16 @@ export default function Navbar() {
                 {link.label}
               </Link>
             )
-          ))}
+          )}
+
+          {user && (
+            <div style={inlineStyles.userSection}>
+              <span style={inlineStyles.userName}>👋 {user.name}</span>
+              <button style={inlineStyles.logoutBtn} onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          )}
         </div>
 
         <button
@@ -78,7 +123,7 @@ export default function Navbar() {
 
       {mobileOpen && (
         <div className={styles.mobileMenu}>
-          {links.map((link) => (
+          {links.map((link) =>
             link.isContact ? (
               <a
                 key={link.href}
@@ -98,7 +143,33 @@ export default function Navbar() {
                 {link.label}
               </Link>
             )
-          ))}
+          )}
+
+          {user && (
+            <div style={{ padding: '10px 0' }}>
+              <span style={{ fontSize: '14px', color: '#555' }}>
+                👋 {user.name}
+              </span>
+              <button
+                onClick={handleLogout}
+                style={{
+                  display: 'block',
+                  marginTop: '8px',
+                  padding: '8px 16px',
+                  background: '#ff3b30',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  width: '100%',
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       )}
     </nav>

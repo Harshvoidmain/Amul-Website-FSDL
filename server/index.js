@@ -6,7 +6,7 @@ const productsRouter = require('./routes/products');
 const categoriesRouter = require('./routes/categories');
 const contactRouter = require('./routes/contact');
 const ordersRouter = require('./routes/orders');
-
+const authRouter=require('./routes/authRoutes')
 const app = express();
 
 // Attempt MongoDB connection (non-blocking)
@@ -20,7 +20,7 @@ app.use('/api/products', productsRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/contact', contactRouter);
-
+app.use('/api/auth', authRouter);
 
 
 
